@@ -13,6 +13,7 @@ from pysot.models.loss import select_cross_entropy_loss, weight_l1_loss
 from pysot.models.backbone import get_backbone
 from pysot.models.head import get_rpn_head, get_mask_head, get_refine_head
 from pysot.models.neck import get_neck
+from pysot.models.memory_network import get_key_generator, get_memory_base
 
 
 class ModelBuilder(nn.Module):
@@ -28,6 +29,14 @@ class ModelBuilder(nn.Module):
             self.neck = get_neck(cfg.ADJUST.TYPE,
                                  **cfg.ADJUST.KWARGS)
 
+        # build Memory Network
+        if cfg.MEMORY.MEMORY:
+            self.key_generator = get_key_generator(cfg.MEMORY.KEY_GENERATOR_TYPE,
+                                                   **cfg.MEMORY.KEY_GENERATOR_KWARGS)
+
+            self.memory_base = get_memory_base(cfg.MEMORY.MEMORY_BASE_TYPE,
+                                               **cfg.MEMORY.MEMORY_BASE_KWARGS)
+            
         # build rpn head
         self.rpn_head = get_rpn_head(cfg.RPN.TYPE,
                                      **cfg.RPN.KWARGS)

@@ -198,6 +198,22 @@ __C.ADJUST.KWARGS = CN(new_allowed=True)
 __C.ADJUST.TYPE = "AdjustAllLayer"
 
 # ------------------------------------------------------------------------ #
+# Memory network options
+# ------------------------------------------------------------------------ #
+
+__C.MEMORY = CN()
+
+# Use Memory Network
+__C.MEMORY.MEMORY = True
+
+__C.MEMORY.KEY_GENERATOR_KWARGS = CN(new_allowed=True)
+__C.MEMORY.MEMORY_BASE_KWARGS = CN(new_allowed=True)
+
+# Memory type
+__C.MEMORY.KEY_GENERATOR_TYPE = "KeyGenerator"
+__C.MEMORY.MEMORY_BASE_TYPE = "MemoryBase"
+
+# ------------------------------------------------------------------------ #
 # RPN options
 # ------------------------------------------------------------------------ #
 __C.RPN = CN()
