@@ -55,7 +55,27 @@ class ModelBuilder(nn.Module):
             zf = zf[-1]
         if cfg.ADJUST.ADJUST:
             zf = self.neck(zf)
+        if cfg.MEMORY.MEMORY:
+            self.memory_base.set_f_z_value(zf)
         self.zf = zf
+
+    def template_update(self, z):
+        # feature extract
+        zf = self.backbone(z)
+        if cfg.MASK.MASK:
+            zf = zf[-1]
+        if cfg.ADJUST.ADJUST:
+            zf = self.neck(zf)
+        # added to memory
+        zk = self.key_generator.key_vector_z(zf)
+        result = self.memory_base.memory_write(zk, zf, gamma=cfg.MEMORY.GAMMA, c_init=cfg.MEMORY.C_INIT)
+        return result
+
+    def template_generate(self, xf):
+        f_z_value = self.memory_base.f_z_value
+        xk_list = self.key_generator.forward(self.zf, xf)
+        xk = xk_list[-1]
+        self.zf = self.memory_base(xk)
 
     def track(self, x):
         xf = self.backbone(x)
@@ -64,6 +84,8 @@ class ModelBuilder(nn.Module):
             xf = xf[-1]
         if cfg.ADJUST.ADJUST:
             xf = self.neck(xf)
+        if cfg.MEMORY.MEMORY:
+            self.template_generate(xf)
         cls, loc = self.rpn_head(self.zf, xf)
         if cfg.MASK.MASK:
             mask, self.mask_corr_feature = self.mask_head(self.zf, xf)
@@ -102,6 +124,11 @@ class ModelBuilder(nn.Module):
         if cfg.ADJUST.ADJUST:
             zf = self.neck(zf)
             xf = self.neck(xf)
+        if cfg.MEMORY.MEMORY:
+            xk_vec = self.key_generator(zf, xf)[-1]
+            zk_vec = self.key_generator.key_vector_z(zf)
+            mem_smi = self.memory_base.cos_sim(zk_vec, xk_vec)
+            mem_smi = torch.sigmoid(mem_smi)
         cls, loc = self.rpn_head(zf, xf)
 
         # get loss
@@ -121,4 +148,10 @@ class ModelBuilder(nn.Module):
             mask_loss = None
             outputs['total_loss'] += cfg.TRAIN.MASK_WEIGHT * mask_loss
             outputs['mask_loss'] = mask_loss
+        
+        if cfg.MEMORY.MEMORY:
+            mem_cls_label = torch.max(label_cls.view(xf.size()[0], -1), 1)
+            mem_loss = F.l1_loss(mem_smi, mem_cls_label)
+            outputs['total_loss'] += cfg.TRAIN.MEM_WEIGHT * mem_loss
+            outputs['mem_loss'] = mem_loss
         return outputs

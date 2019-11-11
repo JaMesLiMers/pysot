@@ -112,8 +112,9 @@ class KeyGenerator(nn.Module):
     
     def key_vector_z(self, z):
         """for input z's, key vector (1,c)"""
-        out = self.spp_z(z)
-        return out
+        zk_map = self.key_map(z)
+        zk_vec = self.spp_z(zk_map)
+        return zk_vec
 
     def forward(self, last_z, x):
         """for input last frame z and x, output a x_key_vector (1, c)"""

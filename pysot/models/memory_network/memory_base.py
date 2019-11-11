@@ -31,6 +31,9 @@ class MemoryBase(nn.Module):
         self.softmax = nn.Softmax(dim=0)
         self.sigmoid = nn.Sigmoid()
 
+    def set_f_z_value(self, zf):
+        self.f_z_value = zf
+
     def memory_read(self, x_key):
         """ Memory read, input x_key to give output z """
         cos_res = self.cos_sim(x_key, self.key_memory)
@@ -55,15 +58,17 @@ class MemoryBase(nn.Module):
             one_hot = torch.zeros(self.memory_size).scatter_(0, min_idx_u, 1)
             self.memory_u = (1 - one_hot) * (gamma * self.memory_u + weight) + one_hot * c_init
             print(self.memory_u)
+            return True
+        return False
 
     def fusion(self, z_value, f_z_value, alpha=0.7):
         """fuse the z_value we get and first z"""
         return alpha * z_value + (1 - alpha) * f_z_value
 
-    def forward(self, x_key, f_z_value):
+    def forward(self, x_key):
         """memory read and fusion"""
         new_z = self.memory_read(x_key)
-        result = self.fusion(new_z, f_z_value)
+        result = self.fusion(new_z, self.f_z_value)
         return result
 
 

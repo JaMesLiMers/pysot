@@ -71,6 +71,8 @@ __C.TRAIN.LOC_WEIGHT = 1.2
 
 __C.TRAIN.MASK_WEIGHT = 1
 
+__C.TRAIN.MEM_WEIGHT = 1
+
 __C.TRAIN.PRINT_FREQ = 20
 
 __C.TRAIN.LOG_GRADS = False
@@ -212,6 +214,10 @@ __C.MEMORY.MEMORY_BASE_KWARGS = CN(new_allowed=True)
 # Memory type
 __C.MEMORY.KEY_GENERATOR_TYPE = "KeyGenerator"
 __C.MEMORY.MEMORY_BASE_TYPE = "MemoryBase"
+
+# Memory base setting
+__C.MEMORY.GAMMA = 0.4
+__C.MEMORY.C_INIT = 1
 
 # ------------------------------------------------------------------------ #
 # RPN options
