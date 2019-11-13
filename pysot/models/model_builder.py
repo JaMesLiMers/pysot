@@ -5,6 +5,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -85,7 +86,7 @@ class ModelBuilder(nn.Module):
         if cfg.ADJUST.ADJUST:
             xf = self.neck(xf)
         if cfg.MEMORY.MEMORY:
-            self.template_generate(xf)
+            self.template_generate(xf[-1])
         cls, loc = self.rpn_head(self.zf, xf)
         if cfg.MASK.MASK:
             mask, self.mask_corr_feature = self.mask_head(self.zf, xf)
@@ -117,7 +118,7 @@ class ModelBuilder(nn.Module):
         # get feature
         zf = self.backbone(template)
         xf = self.backbone(search)
-        if cfg.MASK.MASK:
+        if cfg.MASK.MASK or cfg.MEMORY.MEMORY:
             zf = zf[-1]
             self.xf_refine = xf[:-1]
             xf = xf[-1]
@@ -128,7 +129,7 @@ class ModelBuilder(nn.Module):
             xk_vec = self.key_generator(zf, xf)[-1]
             zk_vec = self.key_generator.key_vector_z(zf)
             mem_smi = self.memory_base.cos_sim(zk_vec, xk_vec)
-            mem_smi = torch.sigmoid(mem_smi)
+            mem_smi = (mem_smi + 1 ) / 2
         cls, loc = self.rpn_head(zf, xf)
 
         # get loss
@@ -150,8 +151,8 @@ class ModelBuilder(nn.Module):
             outputs['mask_loss'] = mask_loss
         
         if cfg.MEMORY.MEMORY:
-            mem_cls_label = torch.max(label_cls.view(xf.size()[0], -1), 1)
-            mem_loss = F.l1_loss(mem_smi, mem_cls_label)
+            mem_cls_label = torch.max(label_cls.view(xf.size()[0], -1), 1)[0].float()
+            mem_loss = F.binary_cross_entropy(mem_smi, mem_cls_label)
             outputs['total_loss'] += cfg.TRAIN.MEM_WEIGHT * mem_loss
             outputs['mem_loss'] = mem_loss
         return outputs

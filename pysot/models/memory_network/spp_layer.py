@@ -72,7 +72,7 @@ class CustomSPPLayer(nn.Module):
                 end_j = start_j + self.w_width
                 out_ = self.spp_layer(x[:, :, start_i: end_i, start_j: end_j])
                 if i==0 and j==0:
-                    out = torch.zeros(out_.size()[0], out_.size()[1], self.out_height, self.out_width)
+                    out = torch.zeros(out_.size()[0], out_.size()[1], self.out_height, self.out_width).cuda()
                 out[:,:,i,j] = out_
         return out
 
