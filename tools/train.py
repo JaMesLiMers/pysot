@@ -317,3 +317,5 @@ def main():
 if __name__ == '__main__':
     seed_torch(args.seed)
     main()
+
+    # python -m torch.distributed.launch --nproc_per_node=8 ./tools/train.py
