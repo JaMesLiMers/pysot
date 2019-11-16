@@ -35,7 +35,7 @@ from pysot.core.config import cfg
 
 logger = logging.getLogger('global')
 parser = argparse.ArgumentParser(description='siamrpn tracking')
-parser.add_argument('--cfg', type=str, default='config.yaml',
+parser.add_argument('--cfg', type=str, default='./experiments/mem_siammask_r50_l3/config.yaml',
                     help='configuration of tracking')
 parser.add_argument('--seed', type=int, default=123456,
                     help='random seed')
@@ -316,4 +316,5 @@ def main():
 
 if __name__ == '__main__':
     seed_torch(args.seed)
+    torch.distributed.init_process_group(backend="nccl", init_method='tcp://localhost:23456', rank=0, world_size=1)
     main()
