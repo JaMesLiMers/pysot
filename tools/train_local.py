@@ -35,7 +35,7 @@ from pysot.core.config import cfg
 
 logger = logging.getLogger('global')
 parser = argparse.ArgumentParser(description='siamrpn tracking')
-parser.add_argument('--cfg', type=str, default='./experiments/mem_siammask_r50_l3/config.yaml',
+parser.add_argument('--cfg', type=str, default='./experiments/mem_siamrpn_r50_l3_dwxcorr/config.yaml',
                     help='configuration of tracking')
 parser.add_argument('--seed', type=int, default=123456,
                     help='random seed')
