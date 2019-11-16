@@ -316,5 +316,4 @@ def main():
 
 if __name__ == '__main__':
     seed_torch(args.seed)
-    torch.distributed.init_process_group(backend="nccl", init_method='tcp://localhost:23456', rank=0, world_size=1)
     main()
