@@ -3,6 +3,18 @@ META_ARC: "mem_siamrpn_r50_l3_dwxcorr"
 TRAIN:
     NUM_WORKERS: 16
     BATCH_SIZE : 32
+    LR:
+        TYPE: 'log'
+        KWARGS:
+            start_lr: 0.005
+            end_lr: 0.0005
+    LR_WARMUP:
+        TYPE: 'step'
+        EPOCH: 5
+        KWARGS:
+            start_lr: 0.001
+            end_lr: 0.005
+            step: 1
 
 
 DATASET:
@@ -16,6 +28,7 @@ DATASET:
     DET:
         NUM_USE: -1
     VIDEOS_PER_EPOCH: 600000
+
 
 BACKBONE:
     TYPE: "resnet50"
