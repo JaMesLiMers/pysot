@@ -1,8 +1,8 @@
 META_ARC: "mem_siamrpn_r50_l3_dwxcorr"
 
 TRAIN:
-    NUM_WORKERS: 0
-    BATCH_SIZE : 16
+    NUM_WORKERS: 16
+    BATCH_SIZE : 32
 
 
 DATASET:
